@@ -55,12 +55,11 @@ const ChatInterface = ({ selectedIngredients, initialPrompt }: ChatInterfaceProp
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/recipe-chat`,
+        "/api/chat",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
           },
           body: JSON.stringify({
             messages: [...messages, newUserMessage],
