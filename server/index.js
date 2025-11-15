@@ -77,10 +77,16 @@ app.post('/api/chat', async (req, res) => {
 
     for await (const chunk of result.stream) {
       const text = chunk.text();
-      res.write(`data: ${JSON.stringify({ text })}\n\n`);
+      res.write(`data: ${JSON.stringify({ 
+        choices: [{ 
+          delta: { 
+            content: text 
+          } 
+        }] 
+      })}\n\n`);
     }
 
-    res.write('data: {"done":true}\n\n');
+    res.write('data: [DONE]\n\n');
     res.end();
   } catch (error) {
     console.error('Chat error:', error);
