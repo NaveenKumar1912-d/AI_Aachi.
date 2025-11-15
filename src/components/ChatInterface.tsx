@@ -1,11 +1,20 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Loader2, Sparkles } from "lucide-react";
+import { Send, Loader2, Sparkles, Lightbulb } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import ChatMessage from "@/components/ChatMessage";
+
+const QUICK_SUGGESTIONS = [
+  "What can I make for breakfast?",
+  "Show me a quick lunch recipe",
+  "I want to make something spicy",
+  "Suggest a sweet dish",
+  "What's a good vegetarian recipe?",
+  "Give me a traditional Chettinad recipe",
+];
 
 interface Message {
   role: "user" | "assistant";
@@ -155,6 +164,28 @@ const ChatInterface = ({ selectedIngredients, initialPrompt }: ChatInterfaceProp
           <p className="text-sm text-muted-foreground mt-2">
             Selected: {selectedIngredients.join(", ")}
           </p>
+        )}
+        
+        {messages.length === 1 && !isLoading && (
+          <div className="mt-3">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+              <Lightbulb className="h-3 w-3" />
+              <span>Quick Suggestions:</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {QUICK_SUGGESTIONS.map((suggestion, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSend(suggestion)}
+                  className="text-xs h-7"
+                >
+                  {suggestion}
+                </Button>
+              ))}
+            </div>
+          </div>
         )}
       </CardHeader>
 

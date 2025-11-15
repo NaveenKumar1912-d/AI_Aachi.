@@ -1,5 +1,7 @@
 import { User, ChefHat } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { parseRecipeFromAIResponse } from "@/utils/recipeParser";
+import RecipeStepDisplay from "./RecipeStepDisplay";
 
 interface Message {
   role: "user" | "assistant";
@@ -13,6 +15,9 @@ interface ChatMessageProps {
 
 const ChatMessage = ({ message }: ChatMessageProps) => {
   const isUser = message.role === "user";
+  
+  // Try to parse recipe from assistant messages
+  const parsedRecipe = !isUser ? parseRecipeFromAIResponse(message.content) : null;
 
   return (
     <div
@@ -35,14 +40,15 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             : "bg-muted text-foreground rounded-tl-sm"
         )}
       >
-        {message.image && (
-          <img 
-            src={message.image} 
-            alt="Recipe" 
-            className="rounded-lg mb-3 w-full max-w-md"
+        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+        
+        {parsedRecipe && parsedRecipe.steps.length > 0 && (
+          <RecipeStepDisplay
+            recipeName={parsedRecipe.name}
+            steps={parsedRecipe.steps}
+            image={message.image}
           />
         )}
-        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
       </div>
 
       {isUser && (
