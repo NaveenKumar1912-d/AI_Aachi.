@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-white via-gray-50 to-gray-100">
+    <!-- Hero Section -->
+    <section class="py-20 px-4">
+        <div class="container mx-auto text-center">
+            <h1 class="text-5xl font-bold mb-4 bg-gradient-to-r from-yellow-500 to-green-600 bg-clip-text text-transparent">
+                Welcome to AI Aachi
+            </h1>
+            <p class="text-xl text-gray-600 mb-8">Your AI-powered Tamil Nadu recipe assistant</p>
+            <a href="/ai-cook" class="inline-block bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition">
+                Start Cooking
+            </a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-4">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12">Features</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2">AI Recipe Recommendations</h3>
+                    <p class="text-gray-600">Get personalized recipe suggestions based on your ingredients</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2">Traditional Tamil Cuisine</h3>
+                    <p class="text-gray-600">Explore authentic recipes from different regions of Tamil Nadu</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2">Step-by-Step Guidance</h3>
+                    <p class="text-gray-600">Follow detailed cooking instructions with visual guides</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

@@ -1,8 +1,109 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import RecipeCard from "./RecipeCard";
 import RecipeFilters from "./RecipeFilters";
-import { recipes } from "@/data/recipes";
+import { allTamilNaduRecipes } from "@/data/tamilNaduRecipes";
+import { getRecipeImage } from "@/utils/recipeImageMapper";
 import type { DietType, MealType, SpiceLevel, Region } from "@/data/recipes";
+import type { Recipe } from "@/data/recipes";
+
+// Convert ParsedRecipe to Recipe format
+function convertToRecipe(parsedRecipe: typeof allTamilNaduRecipes[0]): Recipe {
+  const nameLower = parsedRecipe.name.toLowerCase();
+  
+  // Determine diet type
+  const dietType: DietType = parsedRecipe.category === "Vegetarian" ? "veg" : "non-veg";
+  
+  // Determine meal type based on recipe name
+  let mealType: MealType = "lunch";
+  if (nameLower.includes("dosa") || nameLower.includes("idli") || nameLower.includes("pongal") || 
+      nameLower.includes("upma") || nameLower.includes("poha") || nameLower.includes("appam") ||
+      nameLower.includes("puttu") || nameLower.includes("uttapam") || nameLower.includes("adai")) {
+    mealType = "breakfast";
+  } else if (nameLower.includes("vada") || nameLower.includes("bonda") || nameLower.includes("bajji") ||
+             nameLower.includes("pakoda") || nameLower.includes("murukku") || nameLower.includes("mixture") ||
+             nameLower.includes("kothu") || nameLower.includes("parotta") || nameLower.includes("samosa") ||
+             nameLower.includes("kachori") || nameLower.includes("bhel") || nameLower.includes("chips") ||
+             nameLower.includes("chivda") || nameLower.includes("sev") || nameLower.includes("thenkuzhal") ||
+             nameLower.includes("appalam") || nameLower.includes("vadam") || nameLower.includes("vathal") ||
+             nameLower.includes("paniyaram") || nameLower.includes("sevpuri") || nameLower.includes("panipuri")) {
+    mealType = "snacks";
+  } else if (nameLower.includes("payasam") || nameLower.includes("kheer") || nameLower.includes("halwa") ||
+             nameLower.includes("laddu") || nameLower.includes("jamun") || nameLower.includes("barfi") ||
+             nameLower.includes("mysore pak") || nameLower.includes("badusha") || nameLower.includes("jangiri") ||
+             nameLower.includes("adhirasam") || nameLower.includes("kesari")) {
+    mealType = "sweets";
+  } else if (nameLower.includes("coffee") || nameLower.includes("tea") || nameLower.includes("buttermilk") ||
+             nameLower.includes("neer mor") || nameLower.includes("lassi") || nameLower.includes("juice") ||
+             nameLower.includes("shake") || nameLower.includes("milk") && !nameLower.includes("payasam") ||
+             nameLower.includes("panagam") || nameLower.includes("jaggery water") || nameLower.includes("coconut water") ||
+             nameLower.includes("nimbu pani") || nameLower.includes("jal jeera") || nameLower.includes("thandai") ||
+             nameLower.includes("sugarcane") || nameLower.includes("karupatti")) {
+    mealType = "drinks";
+  }
+  
+  // Determine spice level
+  let spiceLevel: SpiceLevel = "medium";
+  if (nameLower.includes("chettinad") || nameLower.includes("madurai") || nameLower.includes("pepper") ||
+      nameLower.includes("chilli") || nameLower.includes("kara")) {
+    spiceLevel = "spicy";
+  } else if (nameLower.includes("sweet") || nameLower.includes("payasam") || nameLower.includes("kheer") ||
+             nameLower.includes("halwa") || nameLower.includes("pongal") && nameLower.includes("sweet")) {
+    spiceLevel = "mild";
+  }
+  
+  // Map region
+  const regionMap: Record<string, Region> = {
+    "chettinad": "chettinad",
+    "madurai": "madurai",
+    "kongu nadu": "kongu",
+    "tanjore": "tanjore",
+  };
+  
+  let region: Region = "general";
+  const recipeRegion = parsedRecipe.region.toLowerCase();
+  for (const [key, value] of Object.entries(regionMap)) {
+    if (recipeRegion.includes(key)) {
+      region = value;
+      break;
+    }
+  }
+  
+  // Generate description
+  const description = `Authentic ${parsedRecipe.region} style ${parsedRecipe.name.toLowerCase()} - ${parsedRecipe.category}`;
+  
+  // Estimate cook time and servings
+  const cookTime = parsedRecipe.cookTime || (parsedRecipe.steps.length * 5 + 10) + " mins";
+  const servings = parsedRecipe.servings ? parseInt(parsedRecipe.servings) : 4;
+  
+  // Estimate calories (rough calculation)
+  const baseCalories = dietType === "veg" ? 200 : 350;
+  const calories = baseCalories + (parsedRecipe.ingredients.length * 10);
+  
+  // Get image
+  const image = parsedRecipe.image || getRecipeImage(parsedRecipe.name, parsedRecipe.id) || "";
+  
+  return {
+    id: parsedRecipe.id,
+    name: parsedRecipe.name,
+    nameEnglish: parsedRecipe.name, // Use same name for now
+    category: mealType,
+    dietType,
+    spiceLevel,
+    region,
+    image,
+    cookTime,
+    servings,
+    calories,
+    protein: dietType === "veg" ? 5 : 25,
+    carbs: 30,
+    fat: dietType === "veg" ? 8 : 15,
+    description,
+    ingredients: parsedRecipe.ingredients,
+    steps: parsedRecipe.steps,
+    stepImages: [], // Will be populated dynamically if needed
+    tips: parsedRecipe.tips || [],
+  };
+}
 
 const PopularRecipes = () => {
   const [selectedDiet, setSelectedDiet] = useState<DietType | "all">("all");
@@ -12,7 +113,12 @@ const PopularRecipes = () => {
 
   const spiceLevelMap: SpiceLevel[] = ["mild", "medium", "spicy"];
 
-  const filteredRecipes = recipes.filter((recipe) => {
+  // Convert Tamil Nadu recipes to Recipe format - show all available recipes (50+)
+  const convertedRecipes = useMemo(() => {
+    return allTamilNaduRecipes.map(convertToRecipe);
+  }, []);
+
+  const filteredRecipes = convertedRecipes.filter((recipe) => {
     const dietMatch = selectedDiet === "all" || recipe.dietType === selectedDiet;
     const mealMatch = selectedMeal === "all" || recipe.category === selectedMeal;
     const regionMatch = selectedRegion === "all" || recipe.region === selectedRegion;

@@ -53,7 +53,7 @@ const Hero = () => {
               onClick={() => navigate("/all-recipes")}
               className="text-lg px-8 border-2"
             >
-              View All 500 Recipes
+              View Recipe
             </Button>
           </div>
         </div>
