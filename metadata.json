@@ -1,0 +1,5 @@
+{
+  "name": "AI Aachi",
+  "description": "An advanced self-learning cooking assistant specializing in Tamil Nadu cuisine. It adapts recipes based on user health, allergies, budget (INR), and past cooking feedback.",
+  "requestFramePermissions": []
+}
